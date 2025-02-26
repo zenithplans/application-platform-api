@@ -1,0 +1,37 @@
+services:
+  idp-pg-db:
+    image: docker.io/library/postgres:16.2-bullseye
+    restart: always
+    container_name: identity-provider-db
+    environment:
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: superadminsecret
+      POSTGRES_DB: identity-provider-local-db
+    ports:
+      - 5432:5432
+    volumes:
+      - idp-pg-data:/var/lib/postgresql/data
+    networks:
+      - idp.net
+
+  pgadmin:
+    image: dpage/pgadmin4:9.0
+    container_name: postgres-manager
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: superadminsecret
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin4
+    depends_on:
+      - idp-pg-db
+    ports:
+      - "5050:80"
+    networks:
+      - idp.net
+
+volumes:
+  idp-pg-data:
+  pgadmin-data:
+
+networks:
+  idp.net:
